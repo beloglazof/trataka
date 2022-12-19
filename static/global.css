@@ -5,8 +5,8 @@ body {
 }
 
 body.simple-light {
-  --bg: #ffffff;
-  --text: #000000;
+  --bg: #fff0c9;
+  --text: #2d2d2d;
   --secondary-text: #999999;
 }
 
@@ -31,6 +31,7 @@ body {
   /* font-family: 'Rubik', sans-serif; */
   /* font-family: 'Ubuntu', sans-serif; */
   font-size: 16px;
+  line-height: 1.4;
   color: var(--text);
   background-color: var(--bg);
   transition: color 0.2s ease-out, background-color 0.2s ease-out, font 0.2s ease-out;

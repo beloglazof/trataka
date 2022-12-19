@@ -31,10 +31,15 @@
     praiseImg9,
     praiseImg10,
     praiseImg11,
-    praiseImg12,
+    praiseImg12
   ];
   const praiseImg = praiseImageList[getRandomInt(0, praiseImageList.length)];
 </script>
+
+<div class="praise-box">
+  <span class="praise-text">Ура! Все круги прочитаны!</span>
+  <img class="praise-image" src={praiseImg} alt="Вы молодец!" width="300" height="300" />
+</div>
 
 <style>
   .praise-box {
@@ -47,13 +52,3 @@
     margin-top: 1em;
   }
 </style>
-
-<div class="praise-box">
-  <span class="praise-text">Ура! Все круги прочитаны!</span>
-  <img
-    class="praise-image"
-    src={praiseImg}
-    alt="Вы молодец!"
-    width="300"
-    height="300" />
-</div>
