@@ -53,6 +53,30 @@
   const pauseButtonName = 'Пауза';
 </script>
 
+<div class="actions">
+  {#if paused || finished}
+    <button class="action-button" type="button" on:click={reset} title={resetButtonName}>
+      <span class="icon-wrapper">
+        <Reset />
+      </span>
+    </button>
+  {/if}
+  {#if started}
+    <button class="action-button" type="button" on:click={pause} title={pauseButtonName}>
+      <span class="icon-wrapper">
+        <Pause />
+      </span>
+    </button>
+  {/if}
+  {#if inactive || paused}
+    <button class="action-button" type="button" on:click={start} title={startButtonName}>
+      <span class="icon-wrapper">
+        <Play />
+      </span>
+    </button>
+  {/if}
+</div>
+
 <style>
   .actions {
     width: 100%;
@@ -68,44 +92,8 @@
     align-items: center;
     background-color: inherit;
   }
-  
+
   .action-button:last-child {
     margin-right: 0;
   }
 </style>
-
-<div class="actions">
-  {#if paused || finished}
-    <button
-      class="action-button"
-      type="button"
-      on:click={reset}
-      title={resetButtonName}>
-      <span class="icon-wrapper">
-        <Reset />
-      </span>
-    </button>
-  {/if}
-  {#if started}
-    <button
-      class="action-button"
-      type="button"
-      on:click={pause}
-      title={pauseButtonName}>
-      <span class="icon-wrapper">
-        <Pause />
-      </span>
-    </button>
-  {/if}
-  {#if inactive || paused}
-    <button
-      class="action-button"
-      type="button"
-      on:click={start}
-      title={startButtonName}>
-      <span class="icon-wrapper">
-        <Play />
-      </span>
-    </button>
-  {/if}
-</div>

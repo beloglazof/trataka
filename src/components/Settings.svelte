@@ -9,6 +9,39 @@
   const minutes = 'минут';
 </script>
 
+<div class="settings">
+  <form class="settings-form">
+    <label class="setting-field" for="rounds">
+      {roundsInputLabel}:
+      <input
+        class="numeric-input"
+        id="rounds"
+        type="number"
+        inputmode="numeric"
+        pattern="[0-9]*"
+        bind:value={rounds}
+        min="1"
+      />
+    </label>
+    <label class="setting-field" for="timeForRound">
+      <span class="icon-wrapper" title={timeForRoundInputLabel}>
+        <Timer width="30px" height="30px" />
+      </span>
+      :
+      <input
+        class="numeric-input"
+        id="timeForRound"
+        type="number"
+        inputmode="numeric"
+        pattern="[0-9]*"
+        bind:value={minutesForRound}
+        min="1"
+      />
+      {minutes}
+    </label>
+  </form>
+</div>
+
 <style>
   .settings {
     margin-bottom: 24px;
@@ -39,34 +72,3 @@
     font-size: 1.1em;
   }
 </style>
-
-<div class="settings">
-  <form class="settings-form">
-    <label class="setting-field" for="rounds">
-      {roundsInputLabel}:
-      <input
-        class="numeric-input"
-        id="rounds"
-        type="number"
-        inputmode="numeric"
-        pattern="[0-9]*"
-        bind:value={rounds}
-        min="1" />
-    </label>
-    <label class="setting-field" for="timeForRound">
-      <span class="icon-wrapper" title={timeForRoundInputLabel}>
-        <Timer width="30px" height="30px" />
-      </span>
-      :
-      <input
-        class="numeric-input"
-        id="timeForRound"
-        type="number"
-        inputmode="numeric"
-        pattern="[0-9]*"
-        bind:value={minutesForRound}
-        min="1" />
-      {minutes}
-    </label>
-  </form>
-</div>
