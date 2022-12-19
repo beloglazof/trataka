@@ -26,16 +26,13 @@
     RAMA,
     RAMA,
     HARE,
-    HARE,
+    HARE
   ];
 
   const MANTRAS_IN_ROUND = 108;
   const SECONDS_IN_MINUTE = 60;
   const WORDS_IN_MANTRA = 16;
-  const LETTERS_IN_MANTRA = mahaMantra.reduce(
-    (acc, word) => acc + word.length,
-    0,
-  );
+  const LETTERS_IN_MANTRA = mahaMantra.reduce((acc, word) => acc + word.length, 0);
 
   let letterCounter = 0;
   let wordCounter = 0;
@@ -191,6 +188,43 @@
   // let wordsLabel = "Слова";
 </script>
 
+<main class="main">
+  {#if !inactive}
+    <div class="counters">
+      <div class="counter">
+        {roundsLabel}:
+        <span class="counter-number">{roundCounter}</span>
+      </div>
+      <div class="counter">
+        {mantrasLabel}:
+        <span class="counter-number">{mantraCounter}</span>
+      </div>
+      <!-- <div class="counter">{wordsLabel}: <span class="counter-number">{wordCounter}</span></div> -->
+    </div>
+  {/if}
+
+  <section class="mantra-box">
+    {#if finished}
+      <Praise />
+    {:else}
+      <div class="mantra-card">
+        {#each mahaMantra as word, i (i)}
+          <span id={`hn-${i}`} class="holy-name">{word}</span>
+          {#if isRowEnd(i)}
+            <br />
+          {/if}
+        {/each}
+      </div>
+    {/if}
+  </section>
+
+  {#if paused || inactive}
+    <Settings bind:rounds bind:minutesForRound />
+  {/if}
+
+  <Actions {start} {reset} {pause} />
+</main>
+
 <style>
   .main {
     padding: 8px 0;
@@ -230,7 +264,7 @@
   }
 
   .mantra-card {
-    font-size: 2em;
+    font-size: 36px;
     font-weight: 500;
   }
 
@@ -238,40 +272,3 @@
     transition: opacity 0.1s cubic-bezier(0.645, 0.045, 0.355, 1);
   }
 </style>
-
-<main class="main">
-  {#if !inactive}
-    <div class="counters">
-      <div class="counter">
-        {roundsLabel}:
-        <span class="counter-number">{roundCounter}</span>
-      </div>
-      <div class="counter">
-        {mantrasLabel}:
-        <span class="counter-number">{mantraCounter}</span>
-      </div>
-      <!-- <div class="counter">{wordsLabel}: <span class="counter-number">{wordCounter}</span></div> -->
-    </div>
-  {/if}
-
-  <section class="mantra-box">
-    {#if finished}
-      <Praise />
-    {:else}
-      <div class="mantra-card">
-        {#each mahaMantra as word, i (i)}
-          <span id={`hn-${i}`} class="holy-name">{word}</span>
-          {#if isRowEnd(i)}
-            <br />
-          {/if}
-        {/each}
-      </div>
-    {/if}
-  </section>
-
-  {#if paused || inactive}
-    <Settings bind:rounds bind:minutesForRound />
-  {/if}
-
-  <Actions {start} {reset} {pause} />
-</main>
