@@ -79,6 +79,7 @@
 
 <style>
   .actions {
+    margin-top: 24px;
     width: 100%;
     display: flex;
     justify-content: center;
