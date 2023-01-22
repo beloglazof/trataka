@@ -5,12 +5,12 @@
   import Praise from './Praise.svelte';
   import Settings from './Settings.svelte';
   import Actions from './Actions.svelte';
+  import Row from './Row.svelte';
 
   const HARE = 'Харе';
   const KRISHNA = 'Кришна';
   const RAMA = 'Рама';
-
-  const mahaMantra = [
+  const MAHA_MANTRA = [
     HARE,
     KRISHNA,
     HARE,
@@ -28,32 +28,36 @@
     HARE,
     HARE
   ];
-
   const MANTRAS_IN_ROUND = 108;
   const SECONDS_IN_MINUTE = 60;
   const WORDS_IN_MANTRA = 16;
-  const LETTERS_IN_MANTRA = mahaMantra.reduce((acc, word) => acc + word.length, 0);
+  const ROW_LENGTH = 2;
 
-  let letterCounter = 0;
   let wordCounter = 0;
+  let rowCounter = 0;
   let mantraCounter = 0;
   let roundCounter = 0;
 
+  let wordsInView = [KRISHNA, KRISHNA];
   let rounds = 1;
-  let minutesForRound = 10;
+  let minutesForRound = 20;
+
+  $: secondsForRound = minutesForRound * SECONDS_IN_MINUTE;
+  $: secondsForMantra = secondsForRound / MANTRAS_IN_ROUND;
+  $: secondsForWord = secondsForMantra / WORDS_IN_MANTRA;
+  $: msForWord = secondsForWord * 1000;
+  $: tickDelay = msForWord * ROW_LENGTH;
 
   function handleCounters() {
-    const wordEnd = letterCounter === mahaMantra[wordCounter].length;
-    if (wordEnd) {
-      letterCounter = 0;
-      wordCounter += 1;
-    }
+    wordCounter = ROW_LENGTH * rowCounter;
+
     const mantraEnd = wordCounter === WORDS_IN_MANTRA;
     if (mantraEnd) {
-      hideMantra();
       wordCounter = 0;
+      rowCounter = 0;
       mantraCounter += 1;
     }
+
     const roundEnd = mantraCounter === MANTRAS_IN_ROUND;
     if (roundEnd) {
       mantraCounter = 0;
@@ -65,28 +69,10 @@
     }
   }
 
-  $: handleCounters(letterCounter, wordCounter, mantraCounter, roundCounter);
-
-  function hideWord(ind) {
-    const wordElement = document.querySelector(`#hn-${ind}`);
-    wordElement.classList.add('hidden');
-  }
-
-  function showWord(ind) {
-    const wordElement = document.querySelector(`#hn-${ind}`);
-    wordElement.classList.remove('hidden');
-  }
-
-  function hideMantra() {
-    mahaMantra.forEach((_, ind) => hideWord(ind));
-  }
-
-  function showMantra() {
-    mahaMantra.forEach((_, ind) => showWord(ind));
-  }
+  $: handleCounters(wordCounter, rowCounter, mantraCounter, roundCounter);
 
   let inactive = false;
-  // let started = false;
+  let started = false;
   let finished = false;
   let paused = false;
 
@@ -94,12 +80,12 @@
     switch (state) {
       case tratakaState.inactive:
         inactive = true;
-        // started = false;
+        started = false;
         finished = false;
         paused = false;
         break;
       case tratakaState.started:
-        // started = true;
+        started = true;
         inactive = false;
         finished = false;
         paused = false;
@@ -107,12 +93,12 @@
       case tratakaState.finished:
         finished = true;
         inactive = false;
-        // started = false;
+        started = false;
         paused = false;
         break;
       case tratakaState.paused:
         paused = true;
-        // started = false;
+        started = false;
         finished = false;
         inactive = false;
         break;
@@ -121,29 +107,22 @@
     }
   });
 
-  function handleLetterTick() {
-    if (letterCounter === 0) {
-      showWord(wordCounter);
-    }
-    letterCounter += 1;
+  function handleTick() {
+    const startIndex = ROW_LENGTH * rowCounter;
+    wordsInView = MAHA_MANTRA.slice(startIndex, startIndex + ROW_LENGTH);
+
+    rowCounter += 1;
   }
 
   let mainIntervalId;
   function start() {
     if (inactive) {
-      hideMantra();
+      wordsInView = [];
     }
 
     tratakaState.start();
-
-    const secondsForRound = minutesForRound * SECONDS_IN_MINUTE;
-    const secondsForMantra = secondsForRound / MANTRAS_IN_ROUND;
-    // const secondsForWord = secondsForMantra / WORDS_IN_MANTRA;
-    const secondForLetter = secondsForMantra / LETTERS_IN_MANTRA;
-    // const msForWord = secondsForWord * 1000;
-    const msForLetter = secondForLetter * 1000;
-
-    mainIntervalId = setInterval(handleLetterTick, msForLetter);
+    handleTick();
+    mainIntervalId = setInterval(handleTick, tickDelay);
   }
 
   function finish() {
@@ -160,115 +139,90 @@
 
   function reset() {
     if (paused) {
-      showMantra();
+      wordsInView = [HARE, KRISHNA];
     }
+
     tratakaState.reset();
     clearInterval(mainIntervalId);
     mainIntervalId = null;
 
-    letterCounter = 0;
     wordCounter = 0;
     mantraCounter = 0;
     roundCounter = 0;
+    rowCounter = 0;
   }
 
   onDestroy(() => {
     reset();
     unsubscribe();
   });
-
-  const rowLength = 2;
-  function isRowEnd(wordInd) {
-    const wordNum = wordInd + 1;
-    return wordNum % rowLength === 0;
-  }
-
-  const roundsLabel = 'Круги';
-  const mantrasLabel = 'Мантры';
-  // let wordsLabel = "Слова";
 </script>
 
 <main class="main">
-  {#if !inactive}
-    <div class="counters">
-      <div class="counter">
-        {roundsLabel}:
-        <span class="counter-number">{roundCounter}</span>
+  {#if !finished}
+    <section class="mantra-box">
+      <div class="mantra-card">
+        {#key rowCounter}
+          <Row words={wordsInView} wordDelay={msForWord} />
+        {/key}
       </div>
-      <div class="counter">
-        {mantrasLabel}:
-        <span class="counter-number">{mantraCounter}</span>
+    </section>
+
+    <div class="image-wrapper">
+      <div>
+        <img
+          class="image"
+          src="images/panca-tattva.jpg"
+          alt="Pancha-Tattva: Advaita-Nityananda-Chaitanya-Gadadhara-Srivasa"
+          title="Advaita-Nityananda-Chaitanya-Gadadhara-Srivasa"
+          width="783"
+          height="1044"
+        />
       </div>
-      <!-- <div class="counter">{wordsLabel}: <span class="counter-number">{wordCounter}</span></div> -->
     </div>
+  {:else}
+    <Praise />
   {/if}
 
-  <section class="mantra-box">
-    {#if finished}
-      <Praise />
-    {:else}
-      <div class="mantra-card">
-        {#each mahaMantra as word, i (i)}
-          <span id={`hn-${i}`} class="holy-name">{word}</span>
-          {#if isRowEnd(i)}
-            <br />
-          {/if}
-        {/each}
-      </div>
-    {/if}
-  </section>
+  <Actions {start} {reset} {pause} />
 
   {#if paused || inactive}
     <Settings bind:rounds bind:minutesForRound />
   {/if}
-
-  <Actions {start} {reset} {pause} />
+  <!-- <div>
+    <p>
+      Круги: {roundCounter}
+      Мантры: {mantraCounter}
+    </p>
+  </div> -->
 </main>
 
 <style>
   .main {
-    padding: 8px 0;
-    height: 540px;
-    max-width: 400px;
-    margin: auto;
+    padding: 8px;
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
+    align-items: center;
   }
 
-  .counters {
-    display: flex;
-    justify-content: flex-end;
-    margin-right: 8px;
+  .image-wrapper {
+    max-width: 600px;
   }
 
-  .counter {
-    font-family: 'Courier New', Courier, monospace;
-    font-size: 14px;
-    margin-right: 10px;
-    color: var(--secondary-text);
-  }
-
-  .counter:last-child {
-    margin-right: 0;
+  .image {
+    display: block;
+    width: 100%;
+    height: 100%;
+    border-radius: 4px;
   }
 
   .mantra-box {
+    margin: 16px 0 24px 0;
+    padding: 4px 8px;
     display: flex;
     justify-content: center;
+    border: 1px solid #333;
+    border-radius: 4px;
     text-align: center;
-    flex: 1;
-    width: 100%;
-    height: 100%;
-    margin: 40px 0;
-  }
-
-  .mantra-card {
-    font-size: 36px;
-    font-weight: 500;
-  }
-
-  .holy-name {
-    transition: opacity 0.1s cubic-bezier(0.645, 0.045, 0.355, 1);
   }
 </style>

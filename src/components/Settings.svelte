@@ -44,7 +44,7 @@
 
 <style>
   .settings {
-    margin-bottom: 24px;
+    margin-top: 24px;
   }
 
   .settings-form {
